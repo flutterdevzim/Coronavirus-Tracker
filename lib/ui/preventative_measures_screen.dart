@@ -1,5 +1,67 @@
 import 'package:covid_19_tracker/utils/color_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:covid_19_tracker/utils/constants.dart';
+
+final List<String> imgList = [
+  'assets/images/hand-wash.jpeg',
+  'assets/images/human_contact.png',
+  'assets/images/prevent_corona_small.png',
+  'assets/images/air.png',
+  'assets/images/doctor_patient.png'
+];
+
+final List<String> stepList = [
+  'Wash your hands frequently',
+  'Maintain social distancing',
+  'Avoid touching eyes, nose and mouth',
+  'Practice respiratory hygiene',
+  'Seek medical care early'
+];
+
+final List<String> infoList = [
+  'Washing your hands with soap and water or using alcohol-based sanitizer kills viruses that may be on your hands.',
+  'Maintain at least 1 metre distance between yourself and anyone who is coughing or sneezing. If you are too close, you can breathe in the droplets, including the COVID-19 virus if the person coughing has the disease. ',
+  'Hands touch many surfaces and can pick up viruses. Once contaminated, hands can transfer the virus to your eyes, nose or mouth. From there, the virus can enter your body and can make you sick.',
+  'Make sure you, and the people around you, follow good respiratory hygiene. This means covering your mouth and nose with your bent elbow or tissue when you cough or sneeze. Then dispose of the used tissue immediately.',
+  'Stay home if you feel unwell. If you have a fever, cough and difficulty breathing, seek medical attention and call in advance. Follow the directions of your local health authority.'
+];
+
+final List carouselImages = map<Widget>(
+  imgList, stepList, infoList,
+      (index, i) {
+    return Container(
+      height: 200,
+      margin: EdgeInsets.all(5.0),
+      child: Column(
+        children: <Widget>[
+          Image.asset(i, fit: BoxFit.fitHeight, width: 200),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(stepList[index],
+              style: Constants.kTitleStyle,),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+              width: 350,
+              child: Text(infoList[index],
+                style: Constants.kSubtitleStyle,),
+            ),
+          )
+        ],
+      ),
+    );
+  },
+).toList();
+
+List<T> map<T>(List list, List wordList, List infoList, Function handler) {
+  List<T> result = [];
+  for (var i = 0; i < list.length; i++) {
+    result.add(handler(i, list[i]));
+  }
+  return result;
+}
 
 class PreventativeMeasuresScreen extends StatefulWidget {
   @override
@@ -9,15 +71,35 @@ class PreventativeMeasuresScreen extends StatefulWidget {
 
 class _PreventativeMeasuresScreenState
     extends State<PreventativeMeasuresScreen> {
+
+  // Step indicator
+  int _current = 0;
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
+        appBar: AppBar(
+            titleSpacing: 0.0,
+            centerTitle: true,
+            leading: _goBackButton(context),
+            title: Text(
+              'Prevention',
+              style: TextStyle(
+                fontSize: 18, fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+            ),
+            backgroundColor: Color(0xFF212b46)
+        ),
         body: Column(
           children: <Widget>[
             Container(
-              height: MediaQuery.of(context).size.width * 0.65,
+              height: MediaQuery
+                  .of(context)
+                  .size
+                  .width * 0.40,
               width: MediaQuery.of(context).size.width,
               color: Colors.transparent,
               child: Stack(
@@ -31,39 +113,6 @@ class _PreventativeMeasuresScreenState
                       ),
                     ),
                     clipper: CustomClipPath(),
-                  ),
-                  Align(
-                    alignment: Alignment.topCenter,
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        left: 10.0,
-                        top: 10.0,
-                        bottom: 10.0,
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          InkWell(
-                            onTap: () => Navigator.of(context).pop(),
-                            child: Icon(
-                              Icons.arrow_back_ios,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.30,
-                          ),
-                          Text(
-                            'Prevention',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 15.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                   ),
                   Positioned(
                     left: 20.0,
@@ -86,7 +135,7 @@ class _PreventativeMeasuresScreenState
                     bottom: 90.0,
                     right: 35.0,
                     child: Text(
-                      'All you need\nis stay at home.',
+                      'All you need to\n do is stay at home.',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -98,83 +147,50 @@ class _PreventativeMeasuresScreenState
               ),
             ),
             Text(
-              'Take steps to protect yourself',
+              'Take steps to protect yourself and others',
               style: TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.bold,
+                fontSize: 18,
               ),
             ),
             SizedBox(
               height: 8.0,
             ),
-            Expanded(
-              child: ListView(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(
-                      left: 20.0,
-                      right: 20.0,
-                    ),
-                    child: Container(
-                      height: 300.0,
-                      decoration: BoxDecoration(
-                        color: Colors.grey,
-                        borderRadius: BorderRadiusDirectional.circular(15.0),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'TODO',
-                        ),
-                      ),
-                    ),
+            Column(
+              children: <Widget>[
+                CarouselSlider(
+                  items: carouselImages,
+                  viewportFraction: 1.0,
+                  aspectRatio: 1.1,
+                  autoPlay: false,
+                  enlargeCenterPage: false,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _current = index;
+                    });
+                  },
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: map<Widget>(
+                    imgList, stepList, infoList,
+                        (index, url) {
+                      return Container(
+                        width: 8.0,
+                        height: 8.0,
+                        margin: EdgeInsets.symmetric(
+                            vertical: 8.0, horizontal: 2.0),
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: _current == index
+                                ? Color.fromRGBO(0, 0, 0, 0.9)
+                                : Color.fromRGBO(0, 0, 0, 0.4)),
+                      );
+                    },
                   ),
-                  SizedBox(
-                    height: 8.0,
-                  ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        left: 10.0,
-                        right: 10.0,
-                        bottom: 10.0,
-                      ),
-                      child: FlatButton(
-                        padding: EdgeInsets.all(15.0),
-                        onPressed: () => {},
-                        color: preventivePageBGColor,
-                        child: Center(
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                              left: 30.0,
-                              right: 30.0,
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text(
-                                  'Steps to protect others',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 5.0,
-                                ),
-                                Icon(
-                                  Icons.arrow_forward_ios,
-                                  color: Colors.white,
-                                  size: 12.0,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ],
         ),
@@ -198,4 +214,12 @@ class CustomClipPath extends CustomClipper<Path> {
 
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+}
+
+Widget _goBackButton(BuildContext context) {
+  return IconButton(
+      icon: Icon(Icons.arrow_back_ios, color: Colors.white),
+      onPressed: () {
+        Navigator.of(context).pop(true);
+      });
 }
